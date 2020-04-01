@@ -15,7 +15,6 @@ import androidx.core.content.FileProvider;
 import com.angelsware.engine.ActivityResultListener;
 import com.angelsware.engine.RequestPermissionResultListener;
 import com.angelsware.engine.AppActivity;
-import com.google.zxing.client.android.BuildConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,7 +75,7 @@ public class ImagePicker implements ActivityResultListener, RequestPermissionRes
 		try {
 			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(AppActivity.getActivity(),
-					BuildConfig.APPLICATION_ID + ".provider", createTemporaryImageFile()));
+					AppActivity.getActivity().getPackageName() + ".provider", createTemporaryImageFile()));
 			AppActivity.getActivity().startActivityForResult(intent, CAMERA_REQUEST_CODE);
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -101,9 +100,6 @@ public class ImagePicker implements ActivityResultListener, RequestPermissionRes
 				case CAMERA_REQUEST_CODE:
 					onImagePicked(this.mLastStoragePath, 1);
 					break;
-				case PERMISSION_REQUEST_CODE:
-					
-					break;
 			}
 		}
 	}
@@ -119,9 +115,8 @@ public class ImagePicker implements ActivityResultListener, RequestPermissionRes
 		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 		String imageFileName = "photo_" + timeStamp + "_";
 
-		// String paths = storageDir.getPath();
 		File image = File.createTempFile(imageFileName, ".jpg", storageDir);
-		mLastStoragePath = "file://" + image.getAbsolutePath();
+		mLastStoragePath = image.getAbsolutePath();
 		return image;
 	}
 

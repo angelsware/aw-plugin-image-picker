@@ -10,6 +10,9 @@
 static Type::CVector<ImagePicker::IImagePickerListener*> sListeners;
 
 JNIEXPORT void JNICALL Java_com_angelsware_imagepicker_ImagePicker_onRequestImagePickerPermissionResult(JNIEnv* env, jclass clazz, jboolean granted) {
+	for (unsigned int i = 0; i < sListeners.getSize(); ++i) {
+		sListeners[i]->onRequestImagePickerPermissionResult(granted);
+	}
 }
 
 JNIEXPORT void JNICALL Java_com_angelsware_imagepicker_ImagePicker_onImagePicked(JNIEnv* env, jclass clazz, jstring filename, jint source) {
