@@ -23,6 +23,7 @@ import java.util.Date;
 
 public class ImagePicker implements ActivityResultListener, RequestPermissionResultListener {
 	private String[] mPermissions = new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE,
+			Manifest.permission.READ_EXTERNAL_STORAGE,
 			Manifest.permission.CAMERA };
 	private String mLastStoragePath;
 	private final int PERMISSION_REQUEST_CODE = 8000;
