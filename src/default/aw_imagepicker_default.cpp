@@ -1,12 +1,35 @@
-#include <statusbar/aw_statusbarfactory.h>
-#include "aw_statusbar_default.h"
+#include "aw_imagepicker_default.h"
 
-namespace StatusBar {
-	IStatusBar* CStatusBarFactory::create() {
-		return new CStatusBar_Default();
+namespace ImagePicker {
+	void CImagePicker_Default::addListener(IImagePickerListener* listener) {
 	}
 
-	void CStatusBarFactory::destroy(IStatusBar* statusBar) {
-		delete statusBar;
+	void CImagePicker_Default::removeListener(IImagePickerListener* listener) {
+	}
+
+	void CImagePicker_Default::clearAllListeners() {
+	}
+
+	void CImagePicker_Default::onCreate() {
+	}
+
+	void CImagePicker_Default::onDestroy() {
+	}
+
+	bool CImagePicker_Default::hasPermission() {
+		return false;
+	}
+
+	bool CImagePicker_Default::shouldShowPermissionDescription() {
+		return false;
+	}
+
+	void CImagePicker_Default::requestPermission() {
+	}
+
+	void CImagePicker_Default::pickImageFromGallery() {
+	}
+
+	void CImagePicker_Default::captureImageFromCamera() {
 	}
 }

@@ -1,16 +1,24 @@
-#ifndef __AW_STATUS_BAR_DEFAULT_H__
-#define __AW_STATUS_BAR_DEFAULT_H__
+#ifndef __AW_IMAGE_PICKER_DEFAULT_H__
+#define __AW_IMAGE_PICKER_DEFAULT_H__
 
-#include <statusbar/aw_statusbar.h>
+#include <imagepicker/aw_imagepicker.h>
 
-namespace StatusBar {
-	class CStatusBar_Default
-		: public IStatusBar
+namespace ImagePicker {
+	class CImagePicker_Default
+		: public IImagePicker
 	{
-	public:
-		// IStatusBar
-		int getStatusBarHeight() { return 0; }
-		int getNavigationBarHeight() { return 0; }
+	private:
+		// IImagePicker
+		void addListener(IImagePickerListener* listener);
+		void removeListener(IImagePickerListener* listener);
+		void clearAllListeners();
+		void onCreate();
+		void onDestroy();
+		bool hasPermission();
+		bool shouldShowPermissionDescription();
+		void requestPermission();
+		void pickImageFromGallery();
+		void captureImageFromCamera();
 	};
 }
 
