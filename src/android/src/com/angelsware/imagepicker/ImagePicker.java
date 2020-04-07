@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 
@@ -21,6 +22,16 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static android.media.ExifInterface.ORIENTATION_FLIP_HORIZONTAL;
+import static android.media.ExifInterface.ORIENTATION_FLIP_VERTICAL;
+import static android.media.ExifInterface.ORIENTATION_NORMAL;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_180;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_270;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_90;
+import static android.media.ExifInterface.ORIENTATION_TRANSPOSE;
+import static android.media.ExifInterface.ORIENTATION_TRANSVERSE;
+import static android.media.ExifInterface.ORIENTATION_UNDEFINED;
+
 public class ImagePicker implements ActivityResultListener, RequestPermissionResultListener {
 	private String[] mPermissions = new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE,
 			Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -31,7 +42,7 @@ public class ImagePicker implements ActivityResultListener, RequestPermissionRes
 	private final int CAMERA_REQUEST_CODE = 8002;
 
 	public static native void onRequestImagePickerPermissionResult(boolean granted);
-	public static native void onImagePicked(String filename, int source);
+	public static native void onImagePicked(String filename, int source, int rotation);
 
 	public void create() {
 		AppActivity appActivity = (AppActivity)AppActivity.getActivity();
@@ -96,13 +107,34 @@ public class ImagePicker implements ActivityResultListener, RequestPermissionRes
 					int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
 					mLastStoragePath = cursor.getString(columnIndex);
 					cursor.close();
-					onImagePicked(this.mLastStoragePath, 0);
+					onImagePicked(this.mLastStoragePath, 0, 0);
 					break;
 				case CAMERA_REQUEST_CODE:
-					onImagePicked(this.mLastStoragePath, 1);
+					int rotation = 0;
+					try {
+						ExifInterface exif = new ExifInterface(this.mLastStoragePath);
+						rotation = rotationToDegrees(exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					onImagePicked(this.mLastStoragePath, 1, rotation);
 					break;
 			}
 		}
+	}
+
+	private int rotationToDegrees(int rotation) {
+		switch (rotation) {
+			case ORIENTATION_ROTATE_180:
+				return 180;
+			case ORIENTATION_ROTATE_270:
+				return 270;
+			case ORIENTATION_ROTATE_90:
+				return 90;
+			default:
+				break;
+		}
+		return 0;
 	}
 
 	private File createTemporaryImageFile() throws IOException {
