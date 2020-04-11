@@ -15,7 +15,7 @@ JNIEXPORT void JNICALL Java_com_angelsware_imagepicker_ImagePicker_onRequestImag
 	}
 }
 
-JNIEXPORT void JNICALL Java_com_angelsware_imagepicker_ImagePicker_onImagePicked(JNIEnv* env, jclass clazz, jstring filename, jint source, jint rotation) {
+JNIEXPORT void JNICALL Java_com_angelsware_imagepicker_ImagePicker_onImagePicked(JNIEnv* env, jclass clazz, jstring filename, jint source, jint width, jint height, jint rotation) {
 	Platform::CJniNativeString filenameStr(filename);
 	ImagePicker::ESource eSource = ImagePicker::ESource::GALLERY;
 	if (source == 1) {
@@ -23,7 +23,7 @@ JNIEXPORT void JNICALL Java_com_angelsware_imagepicker_ImagePicker_onImagePicked
 	}
 
 	for (unsigned int i = 0; i < sListeners.getSize(); ++i) {
-		sListeners[i]->onImagePicked(filenameStr.getText(), eSource, rotation);
+		sListeners[i]->onImagePicked(filenameStr.getText(), eSource, width, height, rotation);
 	}
 }
 

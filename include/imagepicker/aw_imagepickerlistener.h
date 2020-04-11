@@ -8,7 +8,7 @@ namespace ImagePicker {
 	{
 	public:
 		virtual void onRequestImagePickerPermissionResult(bool granted) = 0;
-		virtual void onImagePicked(const char* filename, ESource source, int rotation) = 0;
+		virtual void onImagePicked(const char* filename, ESource source, int width, int height, int rotation) = 0;
 
 	protected:
 		virtual ~IImagePickerListener() {}

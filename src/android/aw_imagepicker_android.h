@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 	JNIEXPORT void JNICALL Java_com_angelsware_imagepicker_ImagePicker_onRequestImagePickerPermissionResult(JNIEnv* env, jclass clazz, jboolean granted);
-	JNIEXPORT void JNICALL Java_com_angelsware_imagepicker_ImagePicker_onImagePicked(JNIEnv* env, jclass clazz, jstring filename, jint source, jint rotation);
+	JNIEXPORT void JNICALL Java_com_angelsware_imagepicker_ImagePicker_onImagePicked(JNIEnv* env, jclass clazz, jstring filename, jint source, jint width, jint height, jint rotation);
 #ifdef __cplusplus
 }
 #endif

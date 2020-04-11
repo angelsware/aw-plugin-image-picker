@@ -42,7 +42,13 @@ public class ImagePicker implements ActivityResultListener, RequestPermissionRes
 	private final int CAMERA_REQUEST_CODE = 8002;
 
 	public static native void onRequestImagePickerPermissionResult(boolean granted);
-	public static native void onImagePicked(String filename, int source, int rotation);
+	public static native void onImagePicked(String filename, int source, int width, int height, int rotation);
+
+	private class ExifData {
+		int width;
+		int height;
+		int rotation;
+	}
 
 	public void create() {
 		AppActivity appActivity = (AppActivity)AppActivity.getActivity();
@@ -107,20 +113,30 @@ public class ImagePicker implements ActivityResultListener, RequestPermissionRes
 					int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
 					mLastStoragePath = cursor.getString(columnIndex);
 					cursor.close();
-					onImagePicked(this.mLastStoragePath, 0, 0);
+					ExifData exifDataFromGalleryPhoto = getExifData();
+					onImagePicked(this.mLastStoragePath, 0, exifDataFromGalleryPhoto.width, exifDataFromGalleryPhoto.height, exifDataFromGalleryPhoto.rotation);
 					break;
 				case CAMERA_REQUEST_CODE:
-					int rotation = 0;
-					try {
-						ExifInterface exif = new ExifInterface(this.mLastStoragePath);
-						rotation = rotationToDegrees(exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					onImagePicked(this.mLastStoragePath, 1, rotation);
+					ExifData exifDataFromCameraPhoto = getExifData();
+					onImagePicked(this.mLastStoragePath, 1, exifDataFromCameraPhoto.width, exifDataFromCameraPhoto.height, exifDataFromCameraPhoto.rotation);
 					break;
 			}
 		}
+	}
+
+	private ExifData getExifData() {
+		ExifData exifData = new ExifData();
+
+		try {
+			ExifInterface exif = new ExifInterface(this.mLastStoragePath);
+			exifData.rotation = rotationToDegrees(exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL));
+			exifData.width = exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0);
+			exifData.height = exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return exifData;
 	}
 
 	private int rotationToDegrees(int rotation) {
