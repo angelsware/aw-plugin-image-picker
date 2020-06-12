@@ -65,11 +65,11 @@ public class ImagePicker implements ActivityResultListener, RequestPermissionRes
 	public boolean hasPermission() {
 		for (String permission : mPermissions) {
 			if (ContextCompat.checkSelfPermission(AppActivity.getActivity(),
-					permission) != PackageManager.PERMISSION_GRANTED)
-				return false;
+					permission) == PackageManager.PERMISSION_GRANTED)
+				return true;
 
 		}
-		return true;
+		return false;
 	}
 
 	public boolean shouldShowRequestPermissionRationale() {
@@ -176,8 +176,8 @@ public class ImagePicker implements ActivityResultListener, RequestPermissionRes
 			int[] grantResults
 	) {
 		if (requestCode == PERMISSION_REQUEST_CODE && permissions.length > 0) {
-			for (int result : grantResults) {
-				if (grantResults[result] != PackageManager.PERMISSION_GRANTED) {
+			for (int i = 0; i < grantResults.length; ++i) {
+				if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
 					onRequestImagePickerPermissionResult(false);
 					return;
 				}
