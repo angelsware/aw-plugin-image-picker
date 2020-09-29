@@ -43,7 +43,7 @@ class ImagePicker: ImagePickerDelegate, UIImagePickerControllerDelegate & UINavi
 		if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary){
 			let imagePicker = UIImagePickerController()
 			imagePicker.delegate = self
-			imagePicker.allowsEditing = false
+			imagePicker.allowsEditing = true
 			imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary
 			UIApplication.shared.keyWindow?.rootViewController?.present(imagePicker, animated: true, completion: nil)
 		}
@@ -54,7 +54,7 @@ class ImagePicker: ImagePickerDelegate, UIImagePickerControllerDelegate & UINavi
 			let imagePicker = UIImagePickerController()
 			imagePicker.delegate = self
 			imagePicker.sourceType = UIImagePickerController.SourceType.camera
-			imagePicker.allowsEditing = false
+			imagePicker.allowsEditing = true
 			UIApplication.shared.keyWindow?.rootViewController?.present(imagePicker, animated: true, completion: nil)
 		} else {
 			let alert  = UIAlertController(title: "Oh no!", message: "This device has no camera", preferredStyle: .alert)
@@ -64,11 +64,8 @@ class ImagePicker: ImagePickerDelegate, UIImagePickerControllerDelegate & UINavi
 	}
 
 	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-		if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-			var filename = ""
-			if let url = info[UIImagePickerControllerImageURL] as? URL {
-				filename = url.path
-			}
+		if let pickedImage = info[UIImagePickerControllerEditedImage] as? UIImage {
+			let filename = saveImage(pickedImage, name: "temporary.jpg")!.path
 			var rotation: Int32 = 0
 			switch (pickedImage.imageOrientation) {
 			case .up, .upMirrored:
@@ -80,11 +77,32 @@ class ImagePicker: ImagePickerDelegate, UIImagePickerControllerDelegate & UINavi
 			case .down, .downMirrored:
 				rotation = 180
 			}
+
+			var source: Int32
+			switch (picker.sourceType) {
+			case .camera:
+				source = 1
+			case .photoLibrary, .savedPhotosAlbum:
+				source = 0
+			}
 			self.listeners.forEach { listener in
-				ImagePickerDelegate.onImagePicked(listener, filename: filename, source: 0, width: Int32(pickedImage.size.width * pickedImage.scale), height: Int32(pickedImage.size.height * pickedImage.scale), rotation: rotation)
+				ImagePickerDelegate.onImagePicked(listener, filename: filename, source: source, width: Int32(pickedImage.size.width * pickedImage.scale), height: Int32(pickedImage.size.height * pickedImage.scale), rotation: rotation)
 			}
 		}
 		picker.dismiss(animated: true, completion: nil)
+	}
+	
+	func saveImage(_ image: UIImage, name: String) -> URL? {
+		guard let imageData = UIImageJPEGRepresentation(image, 1) else {
+			return nil
+		}
+		do {
+			let imageURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent(name)
+			try imageData.write(to: imageURL)
+			return imageURL
+		} catch {
+			return nil
+		}
 	}
 }
 
