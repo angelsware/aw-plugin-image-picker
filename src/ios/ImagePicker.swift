@@ -22,7 +22,7 @@ class ImagePicker: ImagePickerDelegate, UIImagePickerControllerDelegate & UINavi
 	func onDestroy() {}
 
 	func hasPermission() -> Bool {
-        return AVCaptureDevice.authorizationStatus(for: .video) == .authorized
+		return AVCaptureDevice.authorizationStatus(for: .video) == .authorized
 	}
 
 	func shouldShowPermissionDescription() -> Bool {
@@ -30,52 +30,62 @@ class ImagePicker: ImagePickerDelegate, UIImagePickerControllerDelegate & UINavi
 	}
 
 	func requestPermission() {
-        if AVCaptureDevice.authorizationStatus(for: .video) !=  .authorized {
-            AVCaptureDevice.requestAccess(for: .video, completionHandler: { (granted: Bool) in
-                self.listeners.forEach { listener in
-                    ImagePickerDelegate.onRequestImagePickerPermissionResult(listener, granted: granted)
-                }
-            })
-        }
+		if AVCaptureDevice.authorizationStatus(for: .video) !=  .authorized {
+			AVCaptureDevice.requestAccess(for: .video, completionHandler: { (granted: Bool) in
+				self.listeners.forEach { listener in
+					ImagePickerDelegate.onRequestImagePickerPermissionResult(listener, granted: granted)
+				}
+			})
+		}
 	}
 
 	func pickImageFromGallery() {
-        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary){
-            let imagePicker = UIImagePickerController()
-            imagePicker.delegate = self
-            imagePicker.allowsEditing = true
-            imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary
-            UIApplication.shared.keyWindow?.rootViewController?.present(imagePicker, animated: true, completion: nil)
-        }
+		if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary){
+			let imagePicker = UIImagePickerController()
+			imagePicker.delegate = self
+			imagePicker.allowsEditing = false
+			imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary
+			UIApplication.shared.keyWindow?.rootViewController?.present(imagePicker, animated: true, completion: nil)
+		}
 	}
 
 	func captureImageFromCamera() {
-
+		if UIImagePickerController.isSourceTypeAvailable(UIImagePickerController.SourceType.camera) {
+			let imagePicker = UIImagePickerController()
+			imagePicker.delegate = self
+			imagePicker.sourceType = UIImagePickerController.SourceType.camera
+			imagePicker.allowsEditing = false
+			UIApplication.shared.keyWindow?.rootViewController?.present(imagePicker, animated: true, completion: nil)
+		} else {
+			let alert  = UIAlertController(title: "Oh no!", message: "This device has no camera", preferredStyle: .alert)
+			alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+			UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true, completion: nil)
+		}
 	}
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            var filename = ""
-            if let url = info[UIImagePickerControllerImageURL] as? URL {
-                filename = url.path
-            }
-            var rotation: Int32 = 0
-            switch (pickedImage.imageOrientation) {
-            case .up, .upMirrored:
-                rotation = 0
-            case .left, .leftMirrored:
-                rotation = -90
-            case .right, .rightMirrored:
-                rotation = 90
-            case .down, .downMirrored:
-                rotation = 180
-            }
-            self.listeners.forEach { listener in
-                ImagePickerDelegate.onImagePicked(listener, filename: filename, source: 0, width: Int32(pickedImage.size.width * pickedImage.scale), height: Int32(pickedImage.size.height * pickedImage.scale), rotation: rotation)
-            }
-        }
-        picker.dismiss(animated: true, completion: nil)
-    }
+
+	func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+		if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+			var filename = ""
+			if let url = info[UIImagePickerControllerImageURL] as? URL {
+				filename = url.path
+			}
+			var rotation: Int32 = 0
+			switch (pickedImage.imageOrientation) {
+			case .up, .upMirrored:
+				rotation = 0
+			case .left, .leftMirrored:
+				rotation = -90
+			case .right, .rightMirrored:
+				rotation = 90
+			case .down, .downMirrored:
+				rotation = 180
+			}
+			self.listeners.forEach { listener in
+				ImagePickerDelegate.onImagePicked(listener, filename: filename, source: 0, width: Int32(pickedImage.size.width * pickedImage.scale), height: Int32(pickedImage.size.height * pickedImage.scale), rotation: rotation)
+			}
+		}
+		picker.dismiss(animated: true, completion: nil)
+	}
 }
 
 @_cdecl("ImagePicker_create")
