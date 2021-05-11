@@ -9,31 +9,25 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-
 import com.angelsware.engine.ActivityResultListener;
-import com.angelsware.engine.RequestPermissionResultListener;
 import com.angelsware.engine.AppActivity;
+import com.angelsware.engine.RequestPermissionResultListener;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static android.media.ExifInterface.ORIENTATION_FLIP_HORIZONTAL;
-import static android.media.ExifInterface.ORIENTATION_FLIP_VERTICAL;
-import static android.media.ExifInterface.ORIENTATION_NORMAL;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+
 import static android.media.ExifInterface.ORIENTATION_ROTATE_180;
 import static android.media.ExifInterface.ORIENTATION_ROTATE_270;
 import static android.media.ExifInterface.ORIENTATION_ROTATE_90;
-import static android.media.ExifInterface.ORIENTATION_TRANSPOSE;
-import static android.media.ExifInterface.ORIENTATION_TRANSVERSE;
-import static android.media.ExifInterface.ORIENTATION_UNDEFINED;
 
 public class ImagePicker implements ActivityResultListener, RequestPermissionResultListener {
-	private String[] mPermissions = new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE,
+	private final String[] mPermissions = new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE,
 			Manifest.permission.READ_EXTERNAL_STORAGE,
 			Manifest.permission.CAMERA };
 	private String mLastStoragePath;
@@ -44,7 +38,7 @@ public class ImagePicker implements ActivityResultListener, RequestPermissionRes
 	public static native void onRequestImagePickerPermissionResult(boolean granted);
 	public static native void onImagePicked(String filename, int source, int width, int height, int rotation);
 
-	private class ExifData {
+	private static class ExifData {
 		int width;
 		int height;
 		int rotation;
@@ -65,11 +59,11 @@ public class ImagePicker implements ActivityResultListener, RequestPermissionRes
 	public boolean hasPermission() {
 		for (String permission : mPermissions) {
 			if (ContextCompat.checkSelfPermission(AppActivity.getActivity(),
-					permission) == PackageManager.PERMISSION_GRANTED)
-				return true;
+					permission) != PackageManager.PERMISSION_GRANTED)
+				return false;
 
 		}
-		return false;
+		return true;
 	}
 
 	public boolean shouldShowRequestPermissionRationale() {
