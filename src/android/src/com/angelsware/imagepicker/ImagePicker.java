@@ -27,8 +27,7 @@ import static android.media.ExifInterface.ORIENTATION_ROTATE_270;
 import static android.media.ExifInterface.ORIENTATION_ROTATE_90;
 
 public class ImagePicker implements ActivityResultListener, RequestPermissionResultListener {
-	private final String[] mPermissions = new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE,
-			Manifest.permission.READ_EXTERNAL_STORAGE,
+	private final String[] mPermissions = new String[] { Manifest.permission.READ_MEDIA_IMAGES,
 			Manifest.permission.CAMERA };
 	private String mLastStoragePath;
 	private final int PERMISSION_REQUEST_CODE = 8000;
